@@ -10,8 +10,6 @@
 // @grant       none
 // @run-at      document-idle
 // @license MIT
-// @downloadURL https://update.greasyfork.org/scripts/551269/%EC%9C%A0%EC%95%84%EB%A0%90%EA%B0%A4%20%EB%A7%90%ED%88%AC%20%EA%B5%90%EC%A0%95%EA%B8%B0.user.js
-// @updateURL https://update.greasyfork.org/scripts/551269/%EC%9C%A0%EC%95%84%EB%A0%90%EA%B0%A4%20%EB%A7%90%ED%88%AC%20%EA%B5%90%EC%A0%95%EA%B8%B0.meta.js
 // ==/UserScript==
 
 (function() {
