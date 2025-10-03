@@ -38,8 +38,6 @@
         const urlR = /(https?:\/\/[^\s<>]+)/g;
         const tokens = [];
         let lI = 0;
-
-        // 1. Tokenization: Split text into URL and non-URL segments
         t.replace(urlR, (match, offset) => {
             const nUT = t.substring(lI, offset);
             if (nUT) tokens.push({ v: nUT });
@@ -54,10 +52,8 @@
         let o = '';
         tokens.forEach(token => {
             if (token.isU) {
-                // URL은 그대로 유지 (마침표 포함)
                 o += token.v;
             } else {
-                // 일반 텍스트는 마침표와 쉼표 제거 후 자모 조합
                 const cleanedT = token.v.replace(/[.,]/g, '');
                 o += a(cleanedT);
             }
@@ -65,8 +61,6 @@
 
         return o;
     }
-
-    // Jamo Assembler (기존 fixText에서 클린업 로직 제거 후 'a'로 이름 변경)
     function a(t) {
         let o = '';
         let c = -1;
