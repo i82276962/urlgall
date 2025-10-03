@@ -2,7 +2,7 @@
 // @name        유아렐갤 말투 교정기
 // @namespace   http://tampermonkey.net/
 // @version     1.1
-// @description 차단하기 직전에 한번 선처하기 위해 만듬 (설정 기능 추가)
+// @description 모바일 페이지 지원
 // @author      urlgall
 // @match       */mini/board/lists/?id=sandboxurl*
 // @match       */mini/board/view/?id=sandboxurl*
