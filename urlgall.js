@@ -1,14 +1,235 @@
 // ==UserScript==
 // @name        유아렐갤 말투 교정기
 // @namespace   http://tampermonkey.net/
-// @version     1.0
-// @description 차단하기 직전에 한번 선처하기 위해 만듬
+// @version     1.1
+// @description 모바일 지원
 // @author      urlgall
 // @match       */mini/board/lists/?id=sandboxurl*
 // @match       */mini/board/view/?id=sandboxurl*
+// @match       */mini/sandboxurl*
 // @grant       none
 // @run-at      document-idle
 // @license MIT
+// @downloadURL https://update.greasyfork.org/scripts/551269/%EC%9C%A0%EC%95%84%EB%A0%90%EA%B0%A4%20%EB%A7%90%ED%88%AC%20%EA%B5%90%EC%A0%95%EA%B8%B0.user.js
+// @updateURL https://update.greasyfork.org/scripts/551269/%EC%9C%A0%EC%95%84%EB%A0%90%EA%B0%A4%20%EB%A7%90%ED%88%AC%20%EA%B5%90%EC%A0%95%EA%B8%B0.meta.js
 // ==/UserScript==
- 
-(function(){'use strict';const C1=['ㄱ','ㄲ','ㄴ','ㄷ','ㄸ','ㄹ','ㅁ','ㅂ','ㅃ','ㅅ','ㅆ','ㅇ','ㅈ','ㅉ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ'];const J1=['ㅏ','ㅐ','ㅑ','ㅒ','ㅓ','ㅔ','ㅕ','ㅖ','ㅗ','ㅘ','ㅙ','ㅚ','ㅛ','ㅜ','ㅝ','ㅞ','ㅟ','ㅠ','ㅡ','ㅢ','ㅣ'];const L1=['','ㄱ','ㄲ','ㄳ','ㄴ','ㄵ','ㄶ','ㄷ','ㄹ','ㄺ','ㄻ','ㄼ','ㄽ','ㄾ','ㄿ','ㅀ','ㅁ','ㅂ','ㅄ','ㅅ','ㅆ','ㅇ','ㅈ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ'];const H1=44032;const J2=21;const L2=28;function fixGarbledKorean(v){v=v.replace(/[.,]/g,'');let k='';let x=-1;let z=-1;const _=(r)=>C1.indexOf(r);const __=(r)=>J1.indexOf(r);const ___=(r)=>L1.indexOf(r);const A=(r,e,l=0)=>{if(r===-1||e===-1)return'';const i=H1+(r*J2*L2)+(e*L2)+l;return String.fromCharCode(i)};for(let m=0;m<v.length;m++){const d=v[m];const p=_(d);const q=__(d);const w=p!==-1||q!==-1;if(!w){if(x!==-1&&z!==-1){k+=A(x,z)}else if(x!==-1){k+=C1[x]}k+=d;x=-1;z=-1;continue}if(x===-1&&p!==-1){x=p}else if(x!==-1&&q!==-1){z=q;const y=m+1<v.length?v[m+1]:'';const s=___(y);const h=m+2<v.length?v[m+2]:'';const g=__(h)!==-1;if(s>0){if(!g){k+=A(x,z,s);m++;x=-1;z=-1}else{k+=A(x,z);x=-1;z=-1}}else{k+=A(x,z);x=-1;z=-1}}else{if(x!==-1&&z!==-1){k+=A(x,z);x=-1;z=-1}else if(x!==-1){k+=C1[x];x=-1}if(p!==-1){x=p}else{k+=d}}}if(x!==-1&&z!==-1){k+=A(x,z)}else if(x!==-1){k+=C1[x]}return k}function applyFixToTitles(){const D=document.querySelectorAll('td.gall_tit a, span.title_subject');D.forEach(t=>{const N=t.textContent;const R=fixGarbledKorean(N);const L=t.tagName==='A';if(N!==R){if(L){const C=Array.from(t.children);const T=R.trimStart();const S=document.createTextNode(T);t.innerHTML='';C.forEach(r=>t.appendChild(r));t.appendChild(S)}else{t.textContent=R.trim()}}})}function applyFixToContents(){const W=document.querySelectorAll('div.write_div');W.forEach(t=>{traverseAndFixText(t)});const P=document.querySelectorAll('p.usertxt');P.forEach(t=>{traverseAndFixText(t)})}function traverseAndFixText(E){const K=document.createTreeWalker(E,NodeFilter.SHOW_TEXT,null,false);let Z;const U=[];while(Z=K.nextNode())if(Z.parentNode&&Z.parentNode.nodeName!=='SCRIPT'&&Z.parentNode.nodeName!=='STYLE'){if(!Z.parentNode.classList||!Z.parentNode.classList.contains('korean-fixer-wrapper')){U.push(Z)}}U.forEach(t=>{const O=t.nodeValue;if(!O.trim())return;const F=fixGarbledKorean(O);if(O!==F){const P=t.parentNode;if(!P)return;const I=document.createTextNode(F);const H=document.createElement('span');H.classList.add('korean-fixer-wrapper');H.appendChild(I);P.replaceChild(H,t)}else{t.nodeValue=O.trimStart()}})}applyFixToTitles();applyFixToContents();const observer=new MutationObserver(M=>{let V=false;M.forEach(t=>{if(t.type==='childList'){Array.from(t.addedNodes).forEach(t=>{if(t.nodeType===1){if(t.querySelector('td.gall_tit a')||t.querySelector('span.title_subject')||t.querySelector('div.write_div')||t.querySelector('p.usertxt')){V=true}}})}});if(V){applyFixToTitles();applyFixToContents()}});observer.observe(document.body,{childList:true,subtree:true})}());
+
+(function() {
+    'use strict';
+
+    const CHO = [
+        'ㄱ', 'ㄲ', 'ㄴ', 'ㄷ', 'ㄸ', 'ㄹ', 'ㅁ', 'ㅂ', 'ㅃ', 'ㅅ',
+        'ㅆ', 'ㅇ', 'ㅈ', 'ㅉ', 'ㅊ', 'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ'
+    ];
+    const JUNG = [
+        'ㅏ', 'ㅐ', 'ㅑ', 'ㅒ', 'ㅓ', 'ㅔ', 'ㅕ', 'ㅖ', 'ㅗ', 'ㅘ',
+        'ㅙ', 'ㅚ', 'ㅛ', 'ㅜ', 'ㅝ', 'ㅞ', 'ㅟ', 'ㅠ', 'ㅡ', 'ㅢ',
+        'ㅣ'
+    ];
+    const JONG = [
+        '', 'ㄱ', 'ㄲ', 'ㄳ', 'ㄴ', 'ㄵ', 'ㄶ', 'ㄷ', 'ㄹ', 'ㄺ',
+        'ㄻ', 'ㄼ', 'ㄽ', 'ㄾ', 'ㄿ', 'ㅀ', 'ㅁ', 'ㅂ', 'ㅄ', 'ㅅ',
+        'ㅆ', 'ㅇ', 'ㅈ', 'ㅊ', 'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ'
+    ];
+
+    const H_START = 0xAC00;
+    const J_COUNT = 21;
+    const L_COUNT = 28;
+
+    function fixText(t) {
+        t = t.replace(/[.,]/g, '');
+
+        let o = '';
+        let c = -1;
+        let j = -1;
+
+        const getCI = (char) => CHO.indexOf(char);
+        const getJI = (char) => JUNG.indexOf(char);
+        const getLI = (char) => JONG.indexOf(char);
+
+        const compose = (c, j, l = 0) => {
+            if (c === -1 || j === -1) return '';
+            const code = H_START + (c * J_COUNT * L_COUNT) + (j * L_COUNT) + l;
+            return String.fromCharCode(code);
+        };
+
+        for (let i = 0; i < t.length; i++) {
+            const char = t[i];
+            const ci = getCI(char);
+            const ji = getJI(char);
+
+            const isJamo = (ci !== -1 || ji !== -1);
+
+            if (!isJamo) {
+                if (c !== -1 && j !== -1) {
+                    o += compose(c, j);
+                } else if (c !== -1) {
+                    o += CHO[c];
+                }
+
+                o += char;
+
+                c = -1;
+                j = -1;
+                continue;
+            }
+
+            if (c === -1 && ci !== -1) {
+                c = ci;
+
+            } else if (c !== -1 && ji !== -1) {
+                j = ji;
+
+                const nc = (i + 1 < t.length) ? t[i + 1] : '';
+                const nli = getLI(nc);
+
+                const anc = (i + 2 < t.length) ? t[i + 2] : '';
+                const anisj = getJI(anc) !== -1;
+
+                if (nli > 0) {
+                    if (!anisj) {
+                        o += compose(c, j, nli);
+                        i++;
+                        c = -1;
+                        j = -1;
+                    } else {
+                        o += compose(c, j);
+                        c = -1;
+                        j = -1;
+                    }
+                } else {
+                    o += compose(c, j);
+                    c = -1;
+                    j = -1;
+                }
+
+            } else {
+                if (c !== -1 && j !== -1) {
+                    o += compose(c, j);
+                    c = -1; j = -1;
+                } else if (c !== -1) {
+                    o += CHO[c];
+                    c = -1;
+                }
+
+                if (ci !== -1) {
+                    c = ci;
+                } else {
+                    o += char;
+                }
+            }
+        }
+
+        if (c !== -1 && j !== -1) {
+            o += compose(c, j);
+        } else if (c !== -1) {
+            o += CHO[c];
+        }
+
+        return o;
+    }
+
+    function fixTitles() {
+        const titles = document.querySelectorAll('td.gall_tit a, span.title_subject, span.subjectin, span.tit');
+
+        titles.forEach(el => {
+            const origT = el.textContent;
+            const fixedT = fixText(origT);
+            const isA = el.tagName === 'A';
+
+            if (origT !== fixedT) {
+                if (isA) {
+                    const keepC = Array.from(el.children);
+                    const trimT = fixedT.trimStart();
+                    const newTn = document.createTextNode(trimT);
+
+                    el.innerHTML = '';
+
+                    keepC.forEach(child => el.appendChild(child));
+                    el.appendChild(newTn);
+                } else {
+                    el.textContent = fixedT.trim();
+                }
+            }
+        });
+    }
+
+    function fixContents() {
+        const writes = document.querySelectorAll('div.write_div, div.thum-txtin');
+        writes.forEach(div => {
+            fixNodes(div);
+        });
+
+        const comments = document.querySelectorAll('p.usertxt, p.txt');
+        comments.forEach(p => {
+             fixNodes(p);
+        });
+    }
+
+    function fixNodes(el) {
+        const w = document.createTreeWalker(
+            el,
+            NodeFilter.SHOW_TEXT,
+            null,
+            false
+        );
+
+        let n;
+        const updates = [];
+
+        while (n = w.nextNode()) {
+            if (n.parentNode && n.parentNode.nodeName !== 'SCRIPT' && n.parentNode.nodeName !== 'STYLE') {
+                if (!n.parentNode.classList || (!n.parentNode.classList.contains('korean-fixer-wrapper'))) {
+                    updates.push(n);
+                }
+            }
+        }
+
+        updates.forEach(tn => {
+            const origT = tn.nodeValue;
+            if (!origT.trim()) return;
+
+            const fixedT = fixText(origT);
+
+            if (origT !== fixedT) {
+                const parent = tn.parentNode;
+                if (!parent) return;
+
+                const newTn = document.createTextNode(fixedT);
+                const span = document.createElement('span');
+                span.classList.add('korean-fixer-wrapper');
+
+                span.appendChild(newTn);
+
+                parent.replaceChild(span, tn);
+            } else {
+                tn.nodeValue = origT.trimStart();
+            }
+        });
+    }
+
+    fixTitles();
+    fixContents();
+
+    const observer = new MutationObserver((m) => {
+        let update = false;
+        m.forEach(mutation => {
+            if (mutation.type === 'childList') {
+                Array.from(mutation.addedNodes).forEach(n => {
+                    if (n.nodeType === 1) {
+                        if (n.querySelector('td.gall_tit a') || n.querySelector('span.title_subject') || n.querySelector('span.subjectin') || n.querySelector('span.tit') || n.querySelector('div.write_div') || n.querySelector('div.thum-txtin') || n.querySelector('p.usertxt') || n.querySelector('p.txt')) {
+                             update = true;
+                        }
+                    }
+                });
+            }
+        });
+
+        if (update) {
+            fixTitles();
+            fixContents();
+        }
+    });
+
+    observer.observe(document.body, { childList: true, subtree: true });
+})();
